@@ -1,14 +1,9 @@
-name: run
+name: AWS Cost Exporter
 
 on:
   schedule:
     - cron: "0 0 * * *" # At 00:00 on every day
   workflow_dispatch:
-    inputs:
-      AWS_BUCKET_NAME:
-        description: "The AWS Bucket name of the cost reports"
-        type: string
-        required: true
 
 jobs:
   run:
