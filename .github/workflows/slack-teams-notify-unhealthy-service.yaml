@@ -18,9 +18,3 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
           curl -X POST -H 'Content-type: application/json' --data '{"text":"The service ${{ inputs.service_name }} has become unhealthy."}' $SLACK_WEBHOOK_URL
-      
-      - name: Send message to Microsoft Teams
-        env:
-          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
-        run: |
-          curl -H 'Content-Type: application/json' -d '{"text": "The service ${{ inputs.service_name }} has become unhealthy."}' $TEAMS_WEBHOOK_URL
