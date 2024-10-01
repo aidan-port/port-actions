@@ -123,4 +123,4 @@ jobs:
           clientSecret: ${{ secrets.PORT_CLIENT_SECRET }}
           operation: PATCH_RUN
           runId: ${{fromJson(inputs.port_payload).context.runId}}
-          logMessage: Finished successfully! ✅
+          logMessage: ❌ Service does not meet minimum scorecard criteria for this environment. Language must be Python 🐍
