@@ -17,4 +17,4 @@ jobs:
           SLACK_AUTH_TOKEN: ${{ secrets.SLACK_AUTH_TOKEN }}
           SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
         run: |
-          curl -X POST https://slack.com/api/chat.postMessage -H "Authorization: Bearer $SLACK_AUTH_TOKEN" -H "Content-Type: application/json" -d '{"channel": "$SLACK_CHANNEL_ID","text": "Hello from the user token!"}'
+          curl -X POST https://slack.com/api/chat.postMessage -H "Authorization: Bearer $SLACK_AUTH_TOKEN" -H "Content-Type: application/json" -d '{"channel": "$SLACK_CHANNEL_ID","text": "${{ inputs.service_name }} has become unhealthy. Please address this ASAP!"}'
