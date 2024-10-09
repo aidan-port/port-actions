@@ -24,12 +24,12 @@ jobs:
           CLOUD_PROVIDER=$(echo '${{ github.event.inputs.port_payload }}' | jq -r .cloud_provider)
           CLIENT_ID=$(echo '${{ github.event.inputs.port_payload }}' | jq -r .client_id)
           CLIENT_SECRET=$(echo '${{ github.event.inputs.port_payload }}' | jq -r .client_secret)
-          URL = $(echo '${{ github.event.inputs.port_payload }}' | jq -r .url)
-          GIT_PROVIDER = $(echo '${{ github.events.inputs.port_payload }}' | jq -r .git_provider)
-          PORT_REGION = $(echo '${{ github.events.inputs.port_payload }}' | jq -r .port_region)
-          USER_STORY_1 = $(echo '${{ github.events.inputs.port_payload }}' | jq -r .user_story_1)
-          USER_STORY_2 = $(echo '${{ github.events.inputs.port_payload }}' | jq -r .user_story_2)
-          USER_STORY_3 = $(echo '${{ github.events.inputs.port_payload }}' | jq -r .user_story_3)
+          URL=$(echo '${{ github.event.inputs.port_payload }}' | jq -r .url)
+          GIT_PROVIDER=$(echo '${{ github.events.inputs.port_payload }}' | jq -r .git_provider)
+          PORT_REGION=$(echo '${{ github.events.inputs.port_payload }}' | jq -r .port_region)
+          USER_STORY_1=$(echo '${{ github.events.inputs.port_payload }}' | jq -r .user_story_1)
+          USER_STORY_2=$(echo '${{ github.events.inputs.port_payload }}' | jq -r .user_story_2)
+          USER_STORY_3=$(echo '${{ github.events.inputs.port_payload }}' | jq -r .user_story_3)
 
           # Mask the sensitive data in the logs
           echo "::add-mask::$CLIENT_ID"
