@@ -36,7 +36,7 @@ jobs:
           echo "::add-mask::$CLIENT_SECRET"
 
           # Sanitize CUSTOMER_NAME for branch naming
-          SANITIZED_CUSTOMER_NAME=$(echo "$CUSTOMER_NAME" | tr '[:upper:]' '[:lower:]' | tr -cs '[:alnum:]' '-' | sed 's/^-//;s/-$//')
+          SANITIZED_CUSTOMER_NAME=$(echo "$PROSPECT_NAME" | tr '[:upper:]' '[:lower:]' | tr -cs '[:alnum:]' '-' | sed 's/^-//;s/-$//')
 
           echo "Sanitized Customer Name (Branch): $SANITIZED_CUSTOMER_NAME"
           echo "Cloud Provider: $CLOUD_PROVIDER"
