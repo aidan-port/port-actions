@@ -42,18 +42,25 @@ jobs:
           echo "Cloud Provider: $CLOUD_PROVIDER"
         shell: bash
 
-      # Step 3: Create a new branch using sanitized customer_name
+      # Step 3: Checkout the 'pilot-env-creator' repository
+      - name: Checkout pilot-env-creator repository
+        uses: actions/checkout@v2
+        with:
+          repository: aidan-port/pilot-env-creator  # Replace 'your-org' with the actual organization name
+          token: ${{ secrets.ORG_ADMIN_TOKEN }}
+
+      # Step 4: Create a new branch in the 'pilot-env-creator' repo using sanitized customer_name
       - name: Create a new branch
         run: |
           git checkout -b "$SANITIZED_CUSTOMER_NAME"
           git push origin "$SANITIZED_CUSTOMER_NAME"
 
-      # Step 4: Copy main.tf, variables.tf, and terraform.tfvars from the main branch
+      # Step 5: Copy main.tf, variables.tf, and terraform.tfvars from the main branch
       - name: Copy Terraform files from main
         run: |
           git checkout origin/main -- main.tf variables.tf terraform.tfvars
 
-      # Step 5: Update terraform.tfvars with cloudProvider
+      # Step 6: Update terraform.tfvars with cloudProvider
       - name: Update terraform.tfvars
         run: |
           echo "cloudProvider = \"$CLOUD_PROVIDER\"" >> terraform.tfvars
@@ -66,19 +73,19 @@ jobs:
           echo "user_story_3 = \"$USER_STORY_3\"" >> terraform.tfvars
           echo "url = \"$URL\"" >> terraform.tfvars
 
-      # Step 6: Set environment variable for PORT_BETA_FEATURES_ENABLED
+      # Step 7: Set environment variable for PORT_BETA_FEATURES_ENABLED
       - name: Set PORT_BETA_FEATURES_ENABLED to true
         run: echo "PORT_BETA_FEATURES_ENABLED=false" >> $GITHUB_ENV
 
-      # Step 7: Initialize Terraform
+      # Step 8: Initialize Terraform
       - name: Terraform Init
         run: terraform init -var="clientId=$CLIENT_ID" -var="clientSecret=$CLIENT_SECRET"
 
-      # Step 8: Terraform Import port_page.home_page
+      # Step 9: Terraform Import port_page.home_page
       - name: Terraform Import
         run: terraform import port_page.home_page "\$home" -var="clientId=$CLIENT_ID" -var="clientSecret=$CLIENT_SECRET"
 
-      # Step 9: Extract home_page_identifier using jq
+      # Step 10: Extract home_page_identifier using jq
       - name: Extract home_page_identifier
         id: get_home_page_id
         run: |
@@ -86,10 +93,10 @@ jobs:
           echo "home_page_identifier = \"$HOME_PAGE_IDENTIFIER\"" >> terraform.tfvars
         shell: bash
 
-      # Step 10: Terraform Plan
+      # Step 11: Terraform Plan
       - name: Terraform Plan
         run: terraform plan -out=planfile.tfplan -var="clientId=$CLIENT_ID" -var="clientSecret=$CLIENT_SECRET"
 
-      # Step 11: Terraform Apply (auto-approve)
+      # Step 12: Terraform Apply (auto-approve)
       - name: Terraform Apply
         run: terraform apply "planfile.tfplan" -auto-approve
