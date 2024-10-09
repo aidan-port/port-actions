@@ -100,7 +100,11 @@ jobs:
           echo "PORT_BETA_FEATURES_ENABLED=false" >> $GITHUB_ENV
           echo "TF_VAR_client_id=$CLIENT_ID" >> $GITHUB_ENV
           echo "TF_VAR_client_secret=$CLIENT_SECRET" >> $GITHUB_ENV
-      
+
+      # Step 8: Initialize Terraform
+      - name: Terraform Init
+        run: terraform init
+        
       # Step 9: Terraform Import port_page.home_page
       - name: Terraform Import
         run: terraform import port_page.home_page "$home"
