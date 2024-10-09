@@ -1,0 +1,95 @@
+name: Pilot Environment Creator
+
+on:
+  workflow_dispatch:
+    inputs:
+      port_payload:
+        description: 'Port payload from self-service action run.'
+        required: true
+
+jobs:
+  create-pilot-env:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+
+      # Step 2: Parse JSON input and mask clientId and clientSecret
+      - name: Parse JSON input and mask sensitive data
+        id: parse_json
+        run: |
+          PROSPECT_NAME=$(echo '${{ github.event.inputs.port_payload }}' | jq -r .prospect_name)
+          CLOUD_PROVIDER=$(echo '${{ github.event.inputs.port_payload }}' | jq -r .cloud_provider)
+          CLIENT_ID=$(echo '${{ github.event.inputs.port_payload }}' | jq -r .client_id)
+          CLIENT_SECRET=$(echo '${{ github.event.inputs.port_payload }}' | jq -r .client_secret)
+          URL = $(echo '${{ github.event.inputs.port_payload }}' | jq -r .url)
+          GIT_PROVIDER = $(echo '${{ github.events.inputs.port_payload }}' | jq -r .git_provider)
+          PORT_REGION = $(echo '${{ github.events.inputs.port_payload }}' | jq -r .port_region)
+          USER_STORY_1 = $(echo '${{ github.events.inputs.port_payload }}' | jq -r .user_story_1)
+          USER_STORY_2 = $(echo '${{ github.events.inputs.port_payload }}' | jq -r .user_story_2)
+          USER_STORY_3 = $(echo '${{ github.events.inputs.port_payload }}' | jq -r .user_story_3)
+
+          # Mask the sensitive data in the logs
+          echo "::add-mask::$CLIENT_ID"
+          echo "::add-mask::$CLIENT_SECRET"
+
+          # Sanitize CUSTOMER_NAME for branch naming
+          SANITIZED_CUSTOMER_NAME=$(echo "$CUSTOMER_NAME" | tr '[:upper:]' '[:lower:]' | tr -cs '[:alnum:]' '-' | sed 's/^-//;s/-$//')
+
+          echo "Sanitized Customer Name (Branch): $SANITIZED_CUSTOMER_NAME"
+          echo "Cloud Provider: $CLOUD_PROVIDER"
+        shell: bash
+
+      # Step 3: Create a new branch using sanitized customer_name
+      - name: Create a new branch
+        run: |
+          git checkout -b "$SANITIZED_CUSTOMER_NAME"
+          git push origin "$SANITIZED_CUSTOMER_NAME"
+
+      # Step 4: Copy main.tf, variables.tf, and terraform.tfvars from the main branch
+      - name: Copy Terraform files from main
+        run: |
+          git checkout origin/main -- main.tf variables.tf terraform.tfvars
+
+      # Step 5: Update terraform.tfvars with cloudProvider
+      - name: Update terraform.tfvars
+        run: |
+          echo "cloudProvider = \"$CLOUD_PROVIDER\"" >> terraform.tfvars
+          echo "gitProvider = \"$GIT_PROVIDER\"" >> terraform.tfvars
+          echo "portUrl = \"$URL\"" >> terraform.tfvars
+          echo "gitProvider = \"$GIT_PROVIDER\"" >> terraform.tfvars
+          echo "prospect_name = \"$PROSPECT_NAME\"" >> terraform.tfvars
+          echo "user_story_1 = \"$USER_STORY_1\"" >> terraform.tfvars
+          echo "user_story_2 = \"$USER_STORY_2\"" >> terraform.tfvars
+          echo "user_story_3 = \"$USER_STORY_3\"" >> terraform.tfvars
+          echo "url = \"$URL\"" >> terraform.tfvars
+
+      # Step 6: Set environment variable for PORT_BETA_FEATURES_ENABLED
+      - name: Set PORT_BETA_FEATURES_ENABLED to true
+        run: echo "PORT_BETA_FEATURES_ENABLED=false" >> $GITHUB_ENV
+
+      # Step 7: Initialize Terraform
+      - name: Terraform Init
+        run: terraform init -var="clientId=$CLIENT_ID" -var="clientSecret=$CLIENT_SECRET"
+
+      # Step 8: Terraform Import port_page.home_page
+      - name: Terraform Import
+        run: terraform import port_page.home_page "\$home" -var="clientId=$CLIENT_ID" -var="clientSecret=$CLIENT_SECRET"
+
+      # Step 9: Extract home_page_identifier using jq
+      - name: Extract home_page_identifier
+        id: get_home_page_id
+        run: |
+          HOME_PAGE_IDENTIFIER=$(terraform show -json | jq '.resources[].instances[].attributes.widgets[] | fromjson | .id')
+          echo "home_page_identifier = \"$HOME_PAGE_IDENTIFIER\"" >> terraform.tfvars
+        shell: bash
+
+      # Step 10: Terraform Plan
+      - name: Terraform Plan
+        run: terraform plan -out=planfile.tfplan -var="clientId=$CLIENT_ID" -var="clientSecret=$CLIENT_SECRET"
+
+      # Step 11: Terraform Apply (auto-approve)
+      - name: Terraform Apply
+        run: terraform apply "planfile.tfplan" -auto-approve
