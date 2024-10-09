@@ -75,31 +75,36 @@ jobs:
       # Step 6: Update terraform.tfvars with cloudProvider
       - name: Update terraform.tfvars
         run: |
+          # Remove duplicate variables from terraform.tfvars before appending
+          sed -i '/^cloudProvider/d' terraform.tfvars
+          sed -i '/^gitProvider/d' terraform.tfvars
+          sed -i '/^portUrl/d' terraform.tfvars
+          sed -i '/^prospect_name/d' terraform.tfvars
+          sed -i '/^user_story_1/d' terraform.tfvars
+          sed -i '/^user_story_2/d' terraform.tfvars
+          sed -i '/^user_story_3/d' terraform.tfvars
+          sed -i '/^url/d' terraform.tfvars
+      
           echo "cloudProvider = \"$CLOUD_PROVIDER\"" >> terraform.tfvars
           echo "gitProvider = \"$GIT_PROVIDER\"" >> terraform.tfvars
           echo "portUrl = \"$URL\"" >> terraform.tfvars
-          echo "gitProvider = \"$GIT_PROVIDER\"" >> terraform.tfvars
           echo "prospect_name = \"$PROSPECT_NAME\"" >> terraform.tfvars
           echo "user_story_1 = \"$USER_STORY_1\"" >> terraform.tfvars
           echo "user_story_2 = \"$USER_STORY_2\"" >> terraform.tfvars
           echo "user_story_3 = \"$USER_STORY_3\"" >> terraform.tfvars
           echo "url = \"$URL\"" >> terraform.tfvars
-
+      
       # Step 7: Set environment variable for PORT_BETA_FEATURES_ENABLED
       - name: Set PORT_BETA_FEATURES_ENABLED to true
         run: |
           echo "PORT_BETA_FEATURES_ENABLED=false" >> $GITHUB_ENV
           echo "TF_VAR_client_id=$CLIENT_ID" >> $GITHUB_ENV
           echo "TF_VAR_client_secret=$CLIENT_SECRET" >> $GITHUB_ENV
-
-      # Step 8: Initialize Terraform
-      - name: Terraform Init
-        run: terraform init -var="clientId=$CLIENT_ID" -var="clientSecret=$CLIENT_SECRET"
-
+      
       # Step 9: Terraform Import port_page.home_page
       - name: Terraform Import
-        run: terraform import port_page.home_page "\$home"
-
+        run: terraform import port_page.home_page "$home"
+      
       # Step 10: Extract home_page_identifier using jq
       - name: Extract home_page_identifier
         id: get_home_page_id
@@ -110,7 +115,7 @@ jobs:
 
       # Step 11: Terraform Plan
       - name: Terraform Plan
-        run: terraform plan -out=planfile.tfplan -var="clientId=$CLIENT_ID" -var="clientSecret=$CLIENT_SECRET"
+        run: terraform plan -out=planfile.tfplan
 
       # Step 12: Terraform Apply (auto-approve)
       - name: Terraform Apply
