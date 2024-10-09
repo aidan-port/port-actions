@@ -41,6 +41,16 @@ jobs:
           echo "Sanitized Customer Name (Branch): $SANITIZED_CUSTOMER_NAME"
           echo "Cloud Provider: $CLOUD_PROVIDER"
           echo "SANITIZED_CUSTOMER_NAME=$SANITIZED_CUSTOMER_NAME" >> $GITHUB_ENV
+          echo "PROSPECT_NAME=$PROSPECT_NAME" >> $GITHUB_ENV
+          echo "CLOUD_PROVIDER=$CLOUD_PROVIDER" >> $GITHUB_ENV
+          echo "CLIENT_ID=$CLIENT_ID" >> $GITHUB_ENV
+          echo "CLIENT_SECRET=$CLIENT_SECRET" >> $GITHUB_ENV
+          echo "URL=$URL" >> $GITHUB_ENV
+          echo "GIT_PROVIDER=$GIT_PROVIDER" >> $GITHUB_ENV
+          echo "PORT_REGION=$PORT_REGION" >> $GITHUB_ENV
+          echo "USER_STORY_1=$USER_STORY_1" >> $GITHUB_ENV
+          echo "USER_STORY_2=$USER_STORY_2" >> $GITHUB_ENV
+          echo "USER_STORY_3=$USER_STORY_3" >> $GITHUB_ENV
 
         shell: bash
 
