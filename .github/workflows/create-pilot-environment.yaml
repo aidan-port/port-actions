@@ -75,7 +75,10 @@ jobs:
 
       # Step 7: Set environment variable for PORT_BETA_FEATURES_ENABLED
       - name: Set PORT_BETA_FEATURES_ENABLED to true
-        run: echo "PORT_BETA_FEATURES_ENABLED=false" >> $GITHUB_ENV
+        run: |
+          echo "PORT_BETA_FEATURES_ENABLED=false" >> $GITHUB_ENV
+          echo "TF_VAR_client_id=$CLIENT_ID" >> $GITHUB_ENV
+          echo "TF_VAR_client_secret=$CLIENT_SECRET" >> $GITHUB_ENV
 
       # Step 8: Initialize Terraform
       - name: Terraform Init
@@ -100,3 +103,9 @@ jobs:
       # Step 12: Terraform Apply (auto-approve)
       - name: Terraform Apply
         run: terraform apply "planfile.tfplan" -auto-approve
+
+      # Step 13: Cleanup (unset clientId and clientSecret)
+      - name: Unset sensitive environment variables
+        run: |
+          unset TF_VAR_client_id
+          unset TF_VAR_client_secret
