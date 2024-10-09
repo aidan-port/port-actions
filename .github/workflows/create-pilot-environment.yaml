@@ -40,6 +40,8 @@ jobs:
 
           echo "Sanitized Customer Name (Branch): $SANITIZED_CUSTOMER_NAME"
           echo "Cloud Provider: $CLOUD_PROVIDER"
+          echo "SANITIZED_CUSTOMER_NAME=$SANITIZED_CUSTOMER_NAME" >> $GITHUB_ENV
+
         shell: bash
 
       # Step 3: Checkout the 'pilot-env-creator' repository
